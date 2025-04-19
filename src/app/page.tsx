@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,6 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { getApod, Apod } from "@/services/nasa-apod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { setDesktopBackground } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const NASA_API_KEY = "iMhj1gU40yAOWvy2PwaSFUqb5mdR5GqnrVHwmNGm";
 
@@ -49,18 +49,26 @@ export default function Home() {
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
-          <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md border" />
-          {apodData && (
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="rounded-md border"
+            max={new Date()}
+          />
+          {apodData ? (
             <div className="space-y-2">
-              <h2 className="text-xl font-semibold">{apodData.title}</h2>
-              <p className="text-sm">{apodData.explanation}</p>
-              {apodData.copyright && <p className="text-xs">Copyright: {apodData.copyright}</p>}
+              <h2 className="text-xl font-semibold text-center">{apodData.title}</h2>
+              <Avatar className="w-full h-auto aspect-video rounded-md overflow-hidden">
+                <AvatarImage src={apodData.hdurl} alt={apodData.title} fill style={{objectFit: 'cover'}}  />
+                <AvatarFallback>Fallback</AvatarFallback>
+              </Avatar>
+              {apodData.copyright && <p className="text-xs text-center">Copyright: {apodData.copyright}</p>}
             </div>
-          )}
-          {!apodData && date && (
-            <p className="text-center text-muted-foreground">
-              Loading...
-            </p>
+          ) : date ? (
+            <p className="text-center text-muted-foreground">Loading...</p>
+          ) : (
+            <p className="text-center text-muted-foreground">Select a date to view the Astronomy Picture of the Day.</p>
           )}
         </CardContent>
       </Card>
