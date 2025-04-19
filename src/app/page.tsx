@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { getApod, Apod } from "@/services/nasa-apod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';
 import { Button } from "@/components/ui/button";
@@ -20,13 +19,23 @@ export default function Home() {
   const [apodData, setApodData] = useState<Apod | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false); // New loading state
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchApod() {
       if (!date) return;
 
-      setLoading(true); // Set loading to true when fetching starts
+      const today = new Date();
+      if (date > today) {
+        toast({
+          title: "Error",
+          description: "Cannot select a future date.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setLoading(true);
       const formattedDate = format(date, 'yyyy-MM-dd');
       const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
 
@@ -36,7 +45,7 @@ export default function Home() {
           description: "NASA API key is missing. Ensure NEXT_PUBLIC_NASA_API_KEY is set in your environment variables.",
           variant: "destructive",
         });
-        setLoading(false); // Ensure loading is set to false in case of an error
+        setLoading(false);
         return;
       }
       try {
@@ -53,7 +62,7 @@ export default function Home() {
           variant: "destructive",
         });
       } finally {
-        setLoading(false); // Set loading to false when fetching completes, regardless of success or failure
+        setLoading(false);
       }
     }
 
@@ -112,14 +121,23 @@ export default function Home() {
           <Calendar
             mode="single"
             selected={date}
-            onSelect={setDate}
+            onSelect={(selectedDate) => {
+              if (selectedDate && selectedDate > new Date()) {
+                toast({
+                  title: "Error",
+                  description: "Cannot select a future date.",
+                  variant: "destructive",
+                });
+                return;
+              }
+              setDate(selectedDate);
+            }}
             className="rounded-md border"
             max={new Date()}
           />
           {apodData ? (
             <div className="space-y-2 flex flex-col items-center">
               <h2 className="text-xl font-semibold text-center text-white">{apodData.title}</h2>
-              {apodData.copyright && <p className="text-xs text-center text-white">Copyright: {apodData.copyright}</p>}
                <Button onClick={handleSetWallpaper} disabled={loading}>
                   {loading ? "Loading..." : "Set as Wallpaper"}
                 </Button>
