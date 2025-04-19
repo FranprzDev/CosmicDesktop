@@ -6,6 +6,7 @@ import { getApod, Apod } from "@/services/nasa-apod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { setDesktopBackground } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
 
 const NASA_API_KEY = "iMhj1gU40yAOWvy2PwaSFUqb5mdR5GqnrVHwmNGm";
 
@@ -13,6 +14,7 @@ export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [apodData, setApodData] = useState<Apod | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchApod() {
@@ -23,10 +25,15 @@ export default function Home() {
         const apod = await getApod(formattedDate, NASA_API_KEY);
         setApodData(apod);
         setBackgroundImage(apod.hdurl);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to fetch APOD:", error);
         setApodData(null);
         setBackgroundImage(null);
+        toast({
+          title: "Error fetching APOD",
+          description: error.message,
+          variant: "destructive",
+        });
       }
     }
 
@@ -60,10 +67,11 @@ export default function Home() {
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-center">{apodData.title}</h2>
               <Avatar className="w-full h-auto aspect-video rounded-md overflow-hidden">
-                <AvatarImage src={apodData.hdurl} alt={apodData.title} fill style={{objectFit: 'cover'}}  />
+                <AvatarImage src={apodData.hdurl} alt={apodData.title} style={{objectFit: 'cover'}}  />
                 <AvatarFallback>Fallback</AvatarFallback>
               </Avatar>
               {apodData.copyright && <p className="text-xs text-center">Copyright: {apodData.copyright}</p>}
+              <p className="text-sm text-muted-foreground">{apodData.explanation}</p>
             </div>
           ) : date ? (
             <p className="text-center text-muted-foreground">Loading...</p>
