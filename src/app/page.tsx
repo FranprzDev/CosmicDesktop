@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -14,8 +13,6 @@ declare global {
   }
 }
 
-const NASA_API_KEY = process.env.NASA_API_KEY;
-
 export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [apodData, setApodData] = useState<Apod | null>(null);
@@ -27,8 +24,18 @@ export default function Home() {
       if (!date) return;
 
       const formattedDate = date.toISOString().split('T')[0];
+      const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
+
+      if (!apiKey) {
+        toast({
+          title: "Error",
+          description: "NASA API key is missing. Ensure NEXT_PUBLIC_NASA_API_KEY is set in your environment variables.",
+          variant: "destructive",
+        });
+        return;
+      }
       try {
-        const apod = await getApod(formattedDate, NASA_API_KEY || "");
+        const apod = await getApod(formattedDate, apiKey);
         setApodData(apod);
         setBackgroundImage(apod.hdurl);
       } catch (error: any) {
