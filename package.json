@@ -1,5 +1,5 @@
 {
-  "name": "nextn",
+  "name": "cosmic-desktop",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "electron:dev": "electron .",
+    "electron:build": "npm run build && electron-builder",
+    "package": "electron-packager . CosmicDesktop --overwrite --asar=true --platform=darwin --arch=x64 --icon=assets/icon.icns --prune=true --out=release-builds"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.0.4",
@@ -52,7 +55,10 @@
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "electron": "*",
+    "electron-builder": "*",
+    "electron-packager": "*"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -62,5 +68,33 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "build": {
+    "appId": "com.example.cosmicdesktop",
+    "productName": "Cosmic Desktop",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "node_modules/**/*",
+      "public/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "squirrel",
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm",
+        "snap",
+        "AppImage"
+      ],
+      "category": "Utility"
+    }
   }
 }

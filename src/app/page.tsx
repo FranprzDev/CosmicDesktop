@@ -1,14 +1,20 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { getApod, Apod } from "@/services/nasa-apod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { setDesktopBackground } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
-const NASA_API_KEY = process.env.NEXT_PUBLIC_NASA_API_KEY;
+declare global {
+  interface Window {
+    electron: any;
+  }
+}
+
+const NASA_API_KEY = process.env.NASA_API_KEY;
 
 export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -41,10 +47,35 @@ export default function Home() {
   }, [date, toast]);
 
   useEffect(() => {
-    if (backgroundImage) {
-      setDesktopBackground(backgroundImage);
+    async function setBackground() {
+      if (backgroundImage && window.electron) {
+        try {
+          window.electron.ipcRenderer.send('set-background', backgroundImage);
+          window.electron.ipcRenderer.on('background-set-success', (event: any, message: any) => {
+            toast({
+              title: "Success",
+              description: message,
+            });
+          });
+          window.electron.ipcRenderer.on('background-set-error', (event: any, message: any) => {
+            toast({
+              title: "Error",
+              description: message,
+              variant: "destructive",
+            });
+          });
+        } catch (error: any) {
+          toast({
+            title: "Error setting background",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+      }
     }
-  }, [backgroundImage]);
+
+    setBackground();
+  }, [backgroundImage, toast]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
