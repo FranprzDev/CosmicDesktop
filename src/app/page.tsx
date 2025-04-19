@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { format } from 'date-fns';
+import { Button } from "@/components/ui/button";
 
 declare global {
   interface Window {
@@ -19,11 +20,13 @@ export default function Home() {
   const [apodData, setApodData] = useState<Apod | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false); // New loading state
 
   useEffect(() => {
     async function fetchApod() {
       if (!date) return;
 
+      setLoading(true); // Set loading to true when fetching starts
       const formattedDate = format(date, 'yyyy-MM-dd');
       const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
 
@@ -33,6 +36,7 @@ export default function Home() {
           description: "NASA API key is missing. Ensure NEXT_PUBLIC_NASA_API_KEY is set in your environment variables.",
           variant: "destructive",
         });
+        setLoading(false); // Ensure loading is set to false in case of an error
         return;
       }
       try {
@@ -48,42 +52,46 @@ export default function Home() {
           description: error.message,
           variant: "destructive",
         });
+      } finally {
+        setLoading(false); // Set loading to false when fetching completes, regardless of success or failure
       }
     }
 
     fetchApod();
   }, [date, toast]);
 
-  useEffect(() => {
-    async function setBackground() {
-      if (backgroundImage && window.electron) {
-        try {
-          window.electron.ipcRenderer.send('set-background', backgroundImage);
-          window.electron.ipcRenderer.on('background-set-success', (event: any, message: any) => {
-            toast({
-              title: "Success",
-              description: message,
-            });
-          });
-          window.electron.ipcRenderer.on('background-set-error', (event: any, message: any) => {
-            toast({
-              title: "Error",
-              description: message,
-              variant: "destructive",
-            });
-          });
-        } catch (error: any) {
+  const handleSetWallpaper = async () => {
+    if (backgroundImage && window.electron) {
+      try {
+        window.electron.ipcRenderer.send('set-background', backgroundImage);
+        window.electron.ipcRenderer.on('background-set-success', (event: any, message: any) => {
           toast({
-            title: "Error setting background",
-            description: error.message,
+            title: "Success",
+            description: message,
+          });
+        });
+        window.electron.ipcRenderer.on('background-set-error', (event: any, message: any) => {
+          toast({
+            title: "Error",
+            description: message,
             variant: "destructive",
           });
-        }
+        });
+      } catch (error: any) {
+        toast({
+          title: "Error setting background",
+          description: error.message,
+          variant: "destructive",
+        });
       }
+    } else {
+      toast({
+        title: "Error",
+        description: "No image to set as background.",
+        variant: "destructive",
+      });
     }
-
-    setBackground();
-  }, [backgroundImage, toast]);
+  };
 
   return (
     <div
@@ -111,14 +119,10 @@ export default function Home() {
           {apodData ? (
             <div className="space-y-2 flex flex-col items-center">
               <h2 className="text-xl font-semibold text-center text-white">{apodData.title}</h2>
-              <Avatar className="w-full h-auto aspect-video rounded-md overflow-hidden">
-                {apodData.hdurl ? (
-                  <AvatarImage src={apodData.hdurl} alt={apodData.title} style={{ objectFit: 'cover' }} />
-                ) : (
-                  <AvatarFallback>No Image</AvatarFallback>
-                )}
-              </Avatar>
               {apodData.copyright && <p className="text-xs text-center text-white">Copyright: {apodData.copyright}</p>}
+               <Button onClick={handleSetWallpaper} disabled={loading}>
+                  {loading ? "Loading..." : "Set as Wallpaper"}
+                </Button>
             </div>
           ) : date ? (
             <p className="text-center text-muted-foreground text-white">Loading...</p>
