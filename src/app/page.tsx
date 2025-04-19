@@ -112,7 +112,6 @@ export default function Home() {
                 )}
               </Avatar>
               {apodData.copyright && <p className="text-xs text-center">Copyright: {apodData.copyright}</p>}
-              <p className="text-sm text-muted-foreground">{apodData.explanation}</p>
             </div>
           ) : date ? (
             <p className="text-center text-muted-foreground">Loading...</p>
@@ -124,5 +123,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
