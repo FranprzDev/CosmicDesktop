@@ -38,7 +38,7 @@ export default function Home() {
     }
 
     fetchApod();
-  }, [date]);
+  }, [date, toast]);
 
   useEffect(() => {
     if (backgroundImage) {
@@ -67,7 +67,11 @@ export default function Home() {
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-center">{apodData.title}</h2>
               <Avatar className="w-full h-auto aspect-video rounded-md overflow-hidden">
-                <AvatarImage src={apodData.hdurl} alt={apodData.title} style={{objectFit: 'cover'}}  />
+                {apodData.hdurl ? (
+                  <AvatarImage src={apodData.hdurl} alt={apodData.title} style={{ objectFit: 'cover' }} />
+                ) : (
+                  <AvatarFallback>No Image</AvatarFallback>
+                )}
                 <AvatarFallback>Fallback</AvatarFallback>
               </Avatar>
               {apodData.copyright && <p className="text-xs text-center">Copyright: {apodData.copyright}</p>}
@@ -83,3 +87,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
