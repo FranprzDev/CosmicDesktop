@@ -93,7 +93,7 @@ export default function Home() {
             Select a date to set the Astronomy Picture of the Day as your desktop background.
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
+        <CardContent className="grid gap-4 flex justify-center">
           <Calendar
             mode="single"
             selected={date}
@@ -124,3 +124,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
