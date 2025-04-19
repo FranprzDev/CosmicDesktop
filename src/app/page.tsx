@@ -86,10 +86,19 @@ export default function Home() {
   }, [backgroundImage, toast]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <Card className="w-full max-w-md space-y-4">
+    <div
+      className="flex flex-col items-center justify-center min-h-screen py-2"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        transition: 'background-image 0.5s ease-in-out',
+      }}
+    >
+      <div className="absolute inset-0 bg-black opacity-50 transition duration-500 ease-in-out"></div>
+      <Card className="w-full max-w-md space-y-4 relative z-10 bg-transparent border-none shadow-none">
         <CardHeader className="flex flex-col items-center">
-          <CardTitle className="text-center">Cosmic Desktop</CardTitle>
+          <CardTitle className="text-center text-white text-2xl">Cosmic Desktop</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 flex flex-col items-center">
           <Calendar
@@ -101,7 +110,7 @@ export default function Home() {
           />
           {apodData ? (
             <div className="space-y-2 flex flex-col items-center">
-              <h2 className="text-xl font-semibold text-center">{apodData.title}</h2>
+              <h2 className="text-xl font-semibold text-center text-white">{apodData.title}</h2>
               <Avatar className="w-full h-auto aspect-video rounded-md overflow-hidden">
                 {apodData.hdurl ? (
                   <AvatarImage src={apodData.hdurl} alt={apodData.title} style={{ objectFit: 'cover' }} />
@@ -109,12 +118,12 @@ export default function Home() {
                   <AvatarFallback>No Image</AvatarFallback>
                 )}
               </Avatar>
-              {apodData.copyright && <p className="text-xs text-center">Copyright: {apodData.copyright}</p>}
+              {apodData.copyright && <p className="text-xs text-center text-white">Copyright: {apodData.copyright}</p>}
             </div>
           ) : date ? (
-            <p className="text-center text-muted-foreground">Loading...</p>
+            <p className="text-center text-muted-foreground text-white">Loading...</p>
           ) : (
-            <p className="text-center text-muted-foreground">Select a date to view the Astronomy Picture of the Day.</p>
+            <p className="text-center text-muted-foreground text-white">Select a date to view the Astronomy Picture of the Day.</p>
           )}
         </CardContent>
       </Card>
