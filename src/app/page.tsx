@@ -5,7 +5,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { getApod, Apod } from "@/services/nasa-apod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { format } from 'date-fns';
+import { format, isAfter, isToday } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { Button } from "@/components/ui/button";
 
 declare global {
@@ -26,10 +27,10 @@ export default function Home() {
       if (!date) return;
 
       const today = new Date();
-      if (date > today) {
+      if (isAfter(date, today)) {
         toast({
           title: "Error",
-          description: "Cannot select a future date.",
+          description: "No se puede seleccionar una fecha futura.",
           variant: "destructive",
         });
         return;
@@ -42,7 +43,7 @@ export default function Home() {
       if (!apiKey) {
         toast({
           title: "Error",
-          description: "NASA API key is missing. Ensure NEXT_PUBLIC_NASA_API_KEY is set in your environment variables.",
+          description: "Falta la clave de la API de la NASA. Asegúrese de que NEXT_PUBLIC_NASA_API_KEY esté configurada en sus variables de entorno.",
           variant: "destructive",
         });
         setLoading(false);
@@ -57,7 +58,7 @@ export default function Home() {
         setApodData(null);
         setBackgroundImage(null);
         toast({
-          title: "Error fetching APOD",
+          title: "Error al obtener APOD",
           description: error.message,
           variant: "destructive",
         });
@@ -75,7 +76,7 @@ export default function Home() {
         window.electron.ipcRenderer.send('set-background', backgroundImage);
         window.electron.ipcRenderer.on('background-set-success', (event: any, message: any) => {
           toast({
-            title: "Success",
+            title: "Éxito",
             description: message,
           });
         });
@@ -88,7 +89,7 @@ export default function Home() {
         });
       } catch (error: any) {
         toast({
-          title: "Error setting background",
+          title: "Error al establecer el fondo de pantalla",
           description: error.message,
           variant: "destructive",
         });
@@ -96,7 +97,7 @@ export default function Home() {
     } else {
       toast({
         title: "Error",
-        description: "No image to set as background.",
+        description: "No hay imagen para establecer como fondo de pantalla.",
         variant: "destructive",
       });
     }
@@ -122,10 +123,10 @@ export default function Home() {
             mode="single"
             selected={date}
             onSelect={(selectedDate) => {
-              if (selectedDate && selectedDate > new Date()) {
+              if (selectedDate && isAfter(selectedDate, new Date())) {
                 toast({
                   title: "Error",
-                  description: "Cannot select a future date.",
+                  description: "No se puede seleccionar una fecha futura.",
                   variant: "destructive",
                 });
                 return;
@@ -134,18 +135,26 @@ export default function Home() {
             }}
             className="rounded-md border"
             max={new Date()}
+            locale={es}
+            disabled={date => isAfter(date, new Date())}
+            classNames={{
+              day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+              day_disabled: "text-muted-foreground opacity-50 text-gray-500",
+              day_outside: "text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
+              day_today: "!text-black"
+            }}
           />
           {apodData ? (
             <div className="space-y-2 flex flex-col items-center">
               <h2 className="text-xl font-semibold text-center text-white">{apodData.title}</h2>
                <Button onClick={handleSetWallpaper} disabled={loading}>
-                  {loading ? "Loading..." : "Set as Wallpaper"}
+                  {loading ? "Cargando..." : "Establecer como fondo de pantalla"}
                 </Button>
             </div>
           ) : date ? (
-            <p className="text-center text-muted-foreground text-white">Loading...</p>
+            <p className="text-center text-muted-foreground text-white">Cargando...</p>
           ) : (
-            <p className="text-center text-muted-foreground text-white">Select a date to view the Astronomy Picture of the Day.</p>
+            <p className="text-center text-muted-foreground text-white">Selecciona una fecha para ver la imagen astronómica del día.</p>
           )}
         </CardContent>
       </Card>
