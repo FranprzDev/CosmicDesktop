@@ -134,14 +134,13 @@ export default function Home() {
               setDate(selectedDate);
             }}
             className="rounded-md border"
-            max={new Date()}
             locale={es}
             disabled={date => isAfter(date, new Date())}
             classNames={{
               day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
               day_disabled: "text-muted-foreground opacity-50 text-gray-500",
               day_outside: "text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
-              day_today: "!text-black"
+              day_today: "!text-[#ffffff]"
             }}
           />
           {apodData ? (
