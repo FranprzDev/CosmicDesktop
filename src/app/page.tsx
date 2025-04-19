@@ -72,7 +72,6 @@ export default function Home() {
                 ) : (
                   <AvatarFallback>No Image</AvatarFallback>
                 )}
-                <AvatarFallback>Fallback</AvatarFallback>
               </Avatar>
               {apodData.copyright && <p className="text-xs text-center">Copyright: {apodData.copyright}</p>}
               <p className="text-sm text-muted-foreground">{apodData.explanation}</p>
@@ -87,5 +86,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
