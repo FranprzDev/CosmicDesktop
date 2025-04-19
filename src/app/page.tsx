@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { getApod, Apod } from "@/services/nasa-apod";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
+import { format } from 'date-fns';
 
 declare global {
   interface Window {
@@ -23,7 +24,7 @@ export default function Home() {
     async function fetchApod() {
       if (!date) return;
 
-      const formattedDate = date.toISOString().split('T')[0];
+      const formattedDate = format(date, 'yyyy-MM-dd');
       const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
 
       if (!apiKey) {
@@ -87,13 +88,10 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Card className="w-full max-w-md space-y-4">
-        <CardHeader>
+        <CardHeader className="flex flex-col items-center">
           <CardTitle className="text-center">Cosmic Desktop</CardTitle>
-          <CardDescription className="text-center">
-            Select a date to set the Astronomy Picture of the Day as your desktop background.
-          </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 flex justify-center">
+        <CardContent className="grid gap-4 flex flex-col items-center">
           <Calendar
             mode="single"
             selected={date}
@@ -102,7 +100,7 @@ export default function Home() {
             max={new Date()}
           />
           {apodData ? (
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col items-center">
               <h2 className="text-xl font-semibold text-center">{apodData.title}</h2>
               <Avatar className="w-full h-auto aspect-video rounded-md overflow-hidden">
                 {apodData.hdurl ? (
