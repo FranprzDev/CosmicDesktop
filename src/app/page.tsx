@@ -8,7 +8,7 @@ import { setDesktopBackground } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 
-const NASA_API_KEY = "iMhj1gU40yAOWvy2PwaSFUqb5mdR5GqnrVHwmNGm";
+const NASA_API_KEY = process.env.NEXT_PUBLIC_NASA_API_KEY;
 
 export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -22,7 +22,7 @@ export default function Home() {
 
       const formattedDate = date.toISOString().split('T')[0];
       try {
-        const apod = await getApod(formattedDate, NASA_API_KEY);
+        const apod = await getApod(formattedDate, NASA_API_KEY || "");
         setApodData(apod);
         setBackgroundImage(apod.hdurl);
       } catch (error: any) {
