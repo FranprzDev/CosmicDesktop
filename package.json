@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "electron:dev": "electron .",
     "electron:build": "npm run build && electron-builder",
-    "package": "electron-packager . CosmicDesktop --overwrite --asar=true --platform=darwin --arch=x64 --icon=assets/icon.icns --prune=true --out=release-builds"
+    "package": "electron-packager . CosmicDesktop --overwrite --asar --platform=darwin --arch=x64 --icon=assets/icon.icns --prune=true --out=release-builds"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.0.4",
